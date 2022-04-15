@@ -12,9 +12,9 @@ import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class FileCodingRouteBuilder extends RouteBuilder {
@@ -37,6 +37,8 @@ public class FileCodingRouteBuilder extends RouteBuilder {
         format.setLocale("de_ch");
 
         from(config.fromFile())
+                .routeId("ch.dlj.firstRoute")
+                .description("Read from a csv file, unmarshal, convert, filter and write as json")
                 .unmarshal(format)
                 .split(body())
                 .process(exchange -> {
@@ -47,6 +49,14 @@ public class FileCodingRouteBuilder extends RouteBuilder {
                 .filter(simple("${body.active}"))
                 .aggregate(simple("${header.CamelFileName}"), personOutAggregationStrategy)
                     .completionTimeout(100)
+                .process(exchange -> {
+                    List<PersonOut> outs = exchange.getIn().getBody(List.class);
+
+                    List<PersonOut> personOuts = outs.stream().sorted(Comparator
+                            .comparing(PersonOut::getBirthday)).collect(Collectors.toList());
+
+                    exchange.getIn().setBody(personOuts);
+                })
                 .marshal().json(JsonLibrary.Jackson, true)
                 .to(config.toDirectory().replace('#', '$'));
     }
