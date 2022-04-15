@@ -34,7 +34,6 @@ public class FileCodingRouteBuilder extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         BindyCsvDataFormat format = new BindyCsvDataFormat(PersonIn.class);
-        format.setLocale("de_ch");
 
         from(config.fromFile())
                 .routeId("ch.dlj.firstRoute")

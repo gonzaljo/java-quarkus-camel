@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.TimeZone;
 
 public class PersonOut {
 
@@ -15,7 +16,7 @@ public class PersonOut {
     @Getter @Setter
     private String firstName;
     @Getter @Setter
-    @JsonFormat(pattern = "yyyy-mm-dd")
+    @JsonFormat(pattern = "yyyy-mm-dd", timezone = "Europe/Zurich")
     private Date birthday;
     @Getter @Setter
     private boolean active;
